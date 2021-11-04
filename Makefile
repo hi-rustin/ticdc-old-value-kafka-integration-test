@@ -1,4 +1,4 @@
-PROJECT=go-boilerplate
+PROJECT=ticdc-old-value-kafka-integration-test
 GOPATH ?= $(shell go env GOPATH)
 P=8
 
@@ -18,7 +18,7 @@ GOTEST          := $(GO) test -p $(P)
 
 PACKAGE_LIST  := go list ./...
 PACKAGES  := $$($(PACKAGE_LIST))
-PACKAGE_DIRECTORIES := $(PACKAGE_LIST) | sed 's|github.com/tidb-community-bots/$(PROJECT)||'
+PACKAGE_DIRECTORIES := $(PACKAGE_LIST) | sed 's|github.com/hi-rustin/$(PROJECT)||'
 FILES     := $$(find .$$($(PACKAGE_DIRECTORIES)) -name "*.go")
 
 

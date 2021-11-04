@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	fmt.Println("ti-community-lgtm!")
+	fmt.Println("ticdc-old-value-kafka-integration-test")
 }

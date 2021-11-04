@@ -1,3 +1,3 @@
-module github.com/tidb-community-bots/go-boilerplate
+module github.com/hi-rustin/ticdc-old-value-kafka-integration-test
 
-go 1.14
+go 1.16
