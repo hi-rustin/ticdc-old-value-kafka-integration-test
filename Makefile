@@ -22,10 +22,15 @@ PACKAGE_DIRECTORIES := $(PACKAGE_LIST) | sed 's|github.com/hi-rustin/$(PROJECT)|
 FILES     := $$(find .$$($(PACKAGE_DIRECTORIES)) -name "*.go")
 
 
-.PHONY: build clean test dev check tidy
+.PHONY: build clean test dev check tidy grower verifier
 
-build:
-	$(GOBUILD) -o bin/test ./cmd/main.go
+build: grower verifier
+
+grower:
+	$(GOBUILD) -o bin/grower ./cmd/grower/main.go
+
+verifier:
+	$(GOBUILD) -o bin/verifier ./cmd/verifier/main.go
 
 clean:
 	$(GO) clean -i ./...

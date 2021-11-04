@@ -9,9 +9,21 @@ import (
 // We only support the mysql driver.
 const driverName = "mysql"
 
+const (
+	initBalance = 1
+	firstRowID  = 1
+)
+
+const (
+	createTable = "CREATE TABLE test.balances(id INT PRIMARY KEY AUTO_INCREMENT, balance INT)"
+	insert      = "INSERT INTO balances(balance) VALUES (?);"
+	increment   = "UPDATE balances SET balance = balance + 1 WHERE id = ?"
+)
+
 // Conn holds the database connection.
 type Conn struct {
-	db *sql.DB
+	db             *sql.DB
+	currentBalance int
 }
 
 // New a connection to the database.
@@ -21,17 +33,37 @@ func New(dataSourceName string) (*Conn, error) {
 		return nil, err
 	}
 
-	return &Conn{db: db}, nil
+	return &Conn{db: db, currentBalance: initBalance}, nil
 }
 
-func (c *Conn) createTable() error {
-	panic("unimplemented")
+func (c *Conn) CreateTable() error {
+	_, err := c.db.Exec(createTable)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (c *Conn) increment() error {
-	panic("unimplemented")
+func (c *Conn) Init() error {
+	_, err := c.db.Exec(insert, c.currentBalance)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (c *Conn) close() error {
+func (c *Conn) Increment() error {
+	_, err := c.db.Exec(increment, firstRowID)
+	if err != nil {
+		return err
+	}
+	c.currentBalance++
+
+	return nil
+}
+
+func (c *Conn) Close() error {
 	return c.db.Close()
 }
