@@ -1,5 +1,6 @@
 package internal
 
 const (
-	EventNum = 100000
+	EventNum          = 10000000
+	BalanceColumnName = "balance"
 )
