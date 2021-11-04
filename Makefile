@@ -25,7 +25,7 @@ FILES     := $$(find .$$($(PACKAGE_DIRECTORIES)) -name "*.go")
 .PHONY: build clean test dev check tidy
 
 build:
-	$(GOBUILD)
+	$(GOBUILD) -o bin/test ./cmd/main.go
 
 clean:
 	$(GO) clean -i ./...
