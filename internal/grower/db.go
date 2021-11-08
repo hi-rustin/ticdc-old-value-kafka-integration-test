@@ -2,6 +2,7 @@ package grower
 
 import (
 	"database/sql"
+	"github.com/hi-rustin/ticdc-old-value-kafka-integration-test/internal"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -15,9 +16,13 @@ const (
 )
 
 const (
-	createTable = "CREATE TABLE test.balances(id INT PRIMARY KEY AUTO_INCREMENT, balance INT)"
-	insert      = "INSERT INTO balances(balance) VALUES (?);"
-	increment   = "UPDATE balances SET balance = balance + 1 WHERE id = ?"
+	createBalancesTable = "CREATE TABLE test.balances(id INT PRIMARY KEY AUTO_INCREMENT, balance INT);"
+	insertBalance       = "INSERT INTO balances(balance) VALUES (?);"
+	incrementBalance    = "UPDATE balances SET balance = balance + 1 WHERE id = ?;"
+
+	createBalancesParitiesTable = "CREATE TABLE test.balances_parities(id INT PRIMARY KEY AUTO_INCREMENT, parity VARCHAR(255));"
+	insertBalanceParity         = "INSERT INTO balances_parities(balance) VALUES (?);"
+	updateBalanceParity         = "UPDATE balances_parities SET parity = ? WHERE id = ?;"
 )
 
 // Conn holds the database connection.
@@ -37,7 +42,12 @@ func New(dataSourceName string) (*Conn, error) {
 }
 
 func (c *Conn) CreateTable() error {
-	_, err := c.db.Exec(createTable)
+	_, err := c.db.Exec(createBalancesTable)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.db.Exec(createBalancesParitiesTable)
 	if err != nil {
 		return err
 	}
@@ -46,7 +56,12 @@ func (c *Conn) CreateTable() error {
 }
 
 func (c *Conn) Init() error {
-	_, err := c.db.Exec(insert, c.currentBalance)
+	_, err := c.db.Exec(insertBalance, c.currentBalance)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.db.Exec(insertBalanceParity, c.currentBalance)
 	if err != nil {
 		return err
 	}
@@ -55,11 +70,21 @@ func (c *Conn) Init() error {
 }
 
 func (c *Conn) Increment() error {
-	_, err := c.db.Exec(increment, firstRowID)
+	_, err := c.db.Exec(incrementBalance, firstRowID)
 	if err != nil {
 		return err
 	}
 	c.currentBalance++
+
+	parity := internal.Even
+	if c.currentBalance&1 == 0 {
+		parity = internal.Odd
+	}
+
+	_, err = c.db.Exec(updateBalanceParity, parity, firstRowID)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

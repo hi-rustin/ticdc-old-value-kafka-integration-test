@@ -33,23 +33,23 @@ func (consumer *Consumer) Cleanup(sarama.ConsumerGroupSession) error {
 // ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages().
 func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	count := 0
+	log.Printf("Starting process messages...")
 	for message := range claim.Messages() {
-		log.Printf("Starting process messages...")
 		rows, err := consumer.decodeDMLEvents(message)
 		if err != nil {
-			log.Fatal("Decoding DML events failed", err)
+			log.Panicf("Decoding DML events failed: %v", err)
 		}
 		log.Printf("Got %d rows", len(rows))
 		count += len(rows)
 		for _, row := range rows {
 			if !consumer.verifyDMLEvent(row) {
-				log.Fatal("Verify growing value failed")
+				log.Panic("Verify growing value failed")
 			}
 		}
 
 		log.Printf("Current count of row messages: %d", count)
 		if count == internal.EventNum {
-			break
+			session.Context().Done()
 		}
 
 		session.MarkMessage(message, "")
@@ -76,9 +76,15 @@ func (consumer *Consumer) decodeDMLEvents(message *sarama.ConsumerMessage) ([]*m
 		}
 		switch tp {
 		case model.MqMessageTypeDDL:
-			_, _ = batchDecoder.NextDDLEvent()
+			_, err = batchDecoder.NextDDLEvent()
+			if err != nil {
+				return rows, err
+			}
 		case model.MqMessageTypeResolved:
-			_, _ = batchDecoder.NextResolvedEvent()
+			_, err = batchDecoder.NextResolvedEvent()
+			if err != nil {
+				return rows, err
+			}
 		case model.MqMessageTypeRow:
 			row, err := batchDecoder.NextRowChangedEvent()
 			if err != nil {
@@ -105,6 +111,24 @@ func (consumer *Consumer) verifyDMLEvent(row *model.RowChangedEvent) bool {
 					return false
 				} else {
 					return true
+				}
+			}
+
+			if column.Name == internal.ParityColumnName {
+				colValue := column.Value.(string)
+				preColValue := preColumn.Value.(string)
+				log.Printf("preColValue: %s, colValue: %s", preColValue, colValue)
+				switch colValue {
+				case internal.Odd:
+					if preColValue != internal.Even {
+						return false
+					}
+				case internal.Even:
+					if preColValue != internal.Odd {
+						return false
+					}
+				default:
+					return false
 				}
 			}
 		}
