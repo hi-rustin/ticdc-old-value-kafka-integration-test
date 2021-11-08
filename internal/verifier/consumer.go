@@ -14,6 +14,7 @@ type Consumer struct {
 	Ready chan bool
 }
 
+// New create a new group consumer.
 func New() *Consumer {
 	return &Consumer{Ready: make(chan bool)}
 }
@@ -58,6 +59,7 @@ func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 	return nil
 }
 
+// decodeDMLEvents converts the message to a row change events.
 func (consumer *Consumer) decodeDMLEvents(message *sarama.ConsumerMessage) ([]*model.RowChangedEvent, error) {
 	var rows []*model.RowChangedEvent
 
@@ -97,11 +99,14 @@ func (consumer *Consumer) decodeDMLEvents(message *sarama.ConsumerMessage) ([]*m
 	return rows, nil
 }
 
+// verifyDMLEvent checks if the balance change of the received message is 1,
+// and also checks if the parity change is normal.
 func (consumer *Consumer) verifyDMLEvent(row *model.RowChangedEvent) bool {
 	if len(row.Columns) == len(row.PreColumns) {
 		for i := 0; i < len(row.Columns); i++ {
 			column := row.Columns[i]
 			preColumn := row.PreColumns[i]
+
 			if column.Name == internal.BalanceColumnName {
 				colValue := column.Value.(int64)
 				preColValue := preColumn.Value.(int64)
