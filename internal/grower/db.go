@@ -70,8 +70,13 @@ func (c *Conn) Init() error {
 }
 
 func (c *Conn) Increment() error {
-	_, err := c.db.Exec(incrementBalance, firstRowID)
+	txn, err := c.db.Begin()
 	if err != nil {
+		return err
+	}
+	_, err = txn.Exec(incrementBalance, firstRowID)
+	if err != nil {
+		_ = txn.Rollback()
 		return err
 	}
 	c.currentBalance++
@@ -81,7 +86,13 @@ func (c *Conn) Increment() error {
 		parity = internal.Odd
 	}
 
-	_, err = c.db.Exec(updateBalanceParity, parity, firstRowID)
+	_, err = txn.Exec(updateBalanceParity, parity, firstRowID)
+	if err != nil {
+		_ = txn.Rollback()
+		return err
+	}
+
+	err = txn.Commit()
 	if err != nil {
 		return err
 	}
