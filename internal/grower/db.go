@@ -11,15 +11,19 @@ import (
 const driverName = "mysql"
 
 const (
+	// Initialize the balance.
 	initBalance = 1
-	firstRowID  = 1
+	// The ID of the first row, automatically generated, defaults to 1.
+	firstRowID = 1
 )
 
 const (
+	// Balances table.
 	createBalancesTable = "CREATE TABLE test.balances(id INT PRIMARY KEY AUTO_INCREMENT, balance INT);"
 	insertBalance       = "INSERT INTO balances(balance) VALUES (?);"
 	incrementBalance    = "UPDATE balances SET balance = balance + 1 WHERE id = ?;"
 
+	// Balances parity table.
 	createBalancesParitiesTable = "CREATE TABLE test.balances_parities(id INT PRIMARY KEY AUTO_INCREMENT, parity VARCHAR(255));"
 	insertBalanceParity         = "INSERT INTO balances_parities(parity) VALUES (?);"
 	updateBalanceParity         = "UPDATE balances_parities SET parity = ? WHERE id = ?;"
@@ -27,7 +31,8 @@ const (
 
 // Conn holds the database connection.
 type Conn struct {
-	db             *sql.DB
+	db *sql.DB
+	// The current balance that has been received.
 	currentBalance int
 }
 
@@ -41,6 +46,7 @@ func New(dataSourceName string) (*Conn, error) {
 	return &Conn{db: db, currentBalance: initBalance}, nil
 }
 
+// CreateTable creates balances and balances_parities tables.
 func (c *Conn) CreateTable() error {
 	_, err := c.db.Exec(createBalancesTable)
 	if err != nil {
@@ -55,6 +61,7 @@ func (c *Conn) CreateTable() error {
 	return nil
 }
 
+// Init inits balances and balances_parities tables.
 func (c *Conn) Init() error {
 	_, err := c.db.Exec(insertBalance, c.currentBalance)
 	if err != nil {
@@ -69,6 +76,7 @@ func (c *Conn) Init() error {
 	return nil
 }
 
+// Increment gradually increases the balance, each time for 1.
 func (c *Conn) Increment() error {
 	txn, err := c.db.Begin()
 	if err != nil {
@@ -100,6 +108,7 @@ func (c *Conn) Increment() error {
 	return nil
 }
 
+// Close closes database connection.
 func (c *Conn) Close() error {
 	return c.db.Close()
 }
