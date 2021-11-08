@@ -2,9 +2,10 @@ package grower
 
 import (
 	"database/sql"
-	"github.com/hi-rustin/ticdc-old-value-kafka-integration-test/internal"
 
+	// MySQL driver for database/sql.
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/hi-rustin/ticdc-old-value-kafka-integration-test/internal"
 )
 
 // We only support the mysql driver.
@@ -24,9 +25,10 @@ const (
 	incrementBalance    = "UPDATE balances SET balance = balance + 1 WHERE id = ?;"
 
 	// Balances parity table.
-	createBalancesParitiesTable = "CREATE TABLE test.balances_parities(id INT PRIMARY KEY AUTO_INCREMENT, parity VARCHAR(255));"
-	insertBalanceParity         = "INSERT INTO balances_parities(parity) VALUES (?);"
-	updateBalanceParity         = "UPDATE balances_parities SET parity = ? WHERE id = ?;"
+	createBalancesParitiesTable = `CREATE TABLE test.balances_parities
+	(id INT PRIMARY KEY AUTO_INCREMENT, parity VARCHAR(255));`
+	insertBalanceParity = "INSERT INTO balances_parities(parity) VALUES (?);"
+	updateBalanceParity = "UPDATE balances_parities SET parity = ? WHERE id = ?;"
 )
 
 // Conn holds the database connection.

@@ -78,7 +78,8 @@ func main() {
 		}
 	}()
 
-	<-consumer.Ready // Await till the consumer has been set up.
+	// Until the consumer has been set up.
+	<-consumer.Ready
 
 	sigterm := make(chan os.Signal, 1)
 	signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)

@@ -112,11 +112,7 @@ func (consumer *Consumer) verifyDMLEvent(row *model.RowChangedEvent) bool {
 				preColValue := preColumn.Value.(int64)
 				log.Printf("preColValue: %d, colValue: %d", preColValue, colValue)
 
-				if preColValue+1 != colValue {
-					return false
-				} else {
-					return true
-				}
+				return preColValue+1 == colValue
 			}
 
 			if column.Name == internal.ParityColumnName {

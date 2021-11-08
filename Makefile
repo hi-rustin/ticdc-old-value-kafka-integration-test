@@ -18,8 +18,8 @@ GOTEST          := $(GO) test -p $(P)
 
 PACKAGE_LIST  := go list ./...
 PACKAGES  := $$($(PACKAGE_LIST))
-PACKAGE_DIRECTORIES := $(PACKAGE_LIST) | sed 's|github.com/hi-rustin/$(PROJECT)||'
-FILES     := $$(find .$$($(PACKAGE_DIRECTORIES)) -name "*.go")
+PACKAGE_DIRECTORIES := $(PACKAGE_LIST) | sed 's|github.com/hi-rustin/$(PROJECT)/||'
+FILES     := $$(find $$($(PACKAGE_DIRECTORIES)) -name "*.go")
 
 
 .PHONY: build clean test dev check tidy grower verifier
