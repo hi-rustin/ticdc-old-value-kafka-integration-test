@@ -21,7 +21,7 @@ const (
 	incrementBalance    = "UPDATE balances SET balance = balance + 1 WHERE id = ?;"
 
 	createBalancesParitiesTable = "CREATE TABLE test.balances_parities(id INT PRIMARY KEY AUTO_INCREMENT, parity VARCHAR(255));"
-	insertBalanceParity         = "INSERT INTO balances_parities(balance) VALUES (?);"
+	insertBalanceParity         = "INSERT INTO balances_parities(parity) VALUES (?);"
 	updateBalanceParity         = "UPDATE balances_parities SET parity = ? WHERE id = ?;"
 )
 
@@ -61,7 +61,7 @@ func (c *Conn) Init() error {
 		return err
 	}
 
-	_, err = c.db.Exec(insertBalanceParity, c.currentBalance)
+	_, err = c.db.Exec(insertBalanceParity, internal.Odd)
 	if err != nil {
 		return err
 	}

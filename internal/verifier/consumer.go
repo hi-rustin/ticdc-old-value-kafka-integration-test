@@ -115,8 +115,8 @@ func (consumer *Consumer) verifyDMLEvent(row *model.RowChangedEvent) bool {
 			}
 
 			if column.Name == internal.ParityColumnName {
-				colValue := column.Value.(string)
-				preColValue := preColumn.Value.(string)
+				colValue := string(column.Value.([]byte))
+				preColValue := string(preColumn.Value.([]byte))
 				log.Printf("preColValue: %s, colValue: %s", preColValue, colValue)
 				switch colValue {
 				case internal.Odd:
