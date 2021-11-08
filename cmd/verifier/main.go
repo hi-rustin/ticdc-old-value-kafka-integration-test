@@ -45,7 +45,7 @@ func gatherOptions() options {
 func main() {
 	o := gatherOptions()
 	if err := o.validate(); err != nil {
-		log.Fatalf("Invalid options: %v", err)
+		log.Panicf("Invalid options: %v", err)
 	}
 
 	config := sarama.NewConfig()

@@ -35,7 +35,7 @@ func gatherOptions() options {
 func main() {
 	o := gatherOptions()
 	if err := o.validate(); err != nil {
-		log.Fatalf("Invalid options: %v", err)
+		log.Panicf("Invalid options: %v", err)
 	}
 
 	conn, err := grower.New(o.DSN)
@@ -44,23 +44,23 @@ func main() {
 	}(conn)
 
 	if err != nil {
-		log.Fatalf("Connection to database failed: %v", err)
+		log.Panicf("Connection to database failed: %v", err)
 	}
 
 	err = conn.CreateTable()
 	if err != nil {
-		log.Fatalf("Failed to create table: %v", err)
+		log.Panicf("Failed to create table: %v", err)
 	}
 
 	err = conn.Init()
 	if err != nil {
-		log.Fatalf("Failed to init table: %v", err)
+		log.Panicf("Failed to init table: %v", err)
 	}
 
 	for i := 0; i < internal.EventNum; i++ {
 		err = conn.Increment()
 		if err != nil {
-			log.Fatalf("Failed to grow data: %v", err)
+			log.Panicf("Failed to grow data: %v", err)
 		}
 	}
 }
